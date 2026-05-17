@@ -1,0 +1,214 @@
+#Assessment 2 in Programming Fundamentals 
+#Greeting with Student Name and Student Id
+def main():
+    print("Welcome to MIT Session Tracker")
+    print("Created by Ron Aldrin Austria")
+    print("Student Number: 220007036")
+
+    while True:
+        Show_Menu()
+        Choice = input("Select option (1-3):").strip()
+        print("\n--------------------------")
+
+        if Choice == "1":
+            Booking_Process()
+
+        elif Choice == "2":
+            Show_HelpMenu()
+
+        elif Choice == "3":
+            print("Have a Good day, Goodbye and Stay Healthy !!!")
+            break
+
+        else:
+            print("Invalid option. Please choose again from 1, 2, or 3.")
+
+# Main Menu
+def Show_Menu():
+    print("\n=== MAIN MENU ===")
+    print("1. Booking Process")
+    print("2. Need Help?")
+    print("3. Exit")
+
+
+# Variables used for this program
+Session_Limits = { "adult": 5, "youth": 3, "senior": 4 }
+
+ExtraSession = 8
+
+# For Cancelling a Booking
+def Cancel_Booking():
+    while True:
+        Choice = input("Are you sure you want to cancel Yes Or No? (Y/N): ").strip().lower()
+
+        if Choice == "y":
+            print("Booking has been successfully cancelled. It will go back to the Main Menu ...\n")
+            return True
+
+        elif Choice == "n":
+            return False
+
+        else:
+            print("Invalid input. Please enter Y or N.")
+
+
+#BookingProcessSection
+def Booking_Process():
+
+    step = 1
+#This is the first step asking the User_Input for what type of member they are.
+#Validating Member Type
+    while True:
+        if step == 1:
+            User_Input = input(
+                "Enter member type (A/Adult, Y/Youth, S/Senior) Or [B = Back to Menu | C = Cancel Booking]\n> " 
+            ).strip().lower()
+#This will give an option the User_Input to go back to the main menu or cancel the booking.
+            Valid_Inputs = {
+                "adult": "adult", "a": "adult",
+                "youth": "youth", "y": "youth",
+                "senior": "senior", "s": "senior"
+            }
+
+            if User_Input == "b":
+                return
+
+            if User_Input == "c":
+                if Cancel_Booking():
+                    return
+            elif User_Input in Valid_Inputs:
+                Member_Type = Valid_Inputs[User_Input]
+                step = 2
+
+            else:
+                print("Invalid member type. Try again.")
+
+#After confirming the membership type it will ask the User_Input of how many session they Attend.
+#Maintaining the selection of back to the main menu and the booking Cancel_Booking.
+        elif step == 2:
+            User_Input = input(
+                "Enter sessions already attend:\n"
+                "B = Back | C = Cancel\n> "
+            ).strip().lower()
+
+            if User_Input == "b":
+                step = 1
+            elif User_Input == "c":
+                if Cancel_Booking():
+                    return
+                
+            else:
+                try:
+                    Attend = int(User_Input)
+                    if Attend < 0:
+                        print("Number cannot be negative.")
+                    else:
+                        step = 3
+                except ValueError:
+                    print("Invalid input. Enter a whole number.")
+
+# In this part the User_Input will confirm how many new session they will attend for next week then,
+# It will go directly to the logical part. 
+        elif step == 3:
+            User_Input = input(
+                "Enter your new booking session: \n"
+                "B = Back | C = Cancel\n> "
+            ).strip().lower()
+
+            if User_Input == "b":
+                step = 2
+            elif User_Input == "c":
+                if Cancel_Booking():
+                    return
+            else:
+                try:
+                    New_Sessions = int(User_Input)
+                    if New_Sessions < 0:
+                        print("The Number you input cannot be negative. Please try again")
+                    else:
+                        Limit, Total_Session, Remaining_Sessions, Exceed, Costs, Membership_Status = Cal_Session(
+                            Member_Type, Attend, New_Sessions)
+
+                        Receipt(Member_Type, Limit, Attend, New_Sessions,
+                                 Total_Session, Remaining_Sessions, Exceed, Costs, Membership_Status)
+
+                    return
+
+                except ValueError:
+                    print("Invalid input. Enter a whole number.")
+              
+# Calculation part 
+def Cal_Session(Member_Type, Attend, New_Sessions):
+    Limit = Session_Limits[Member_Type]
+    Total_Session = Attend + New_Sessions
+
+    if Total_Session <= Limit:
+        Remaining_Sessions = Limit - Total_Session
+        Exceed = 0
+        Costs = 0
+        Membership_Status = "Within Limit"
+    else:
+        Remaining_Sessions = 0
+        Exceed = Total_Session - Limit
+        Costs = Exceed * ExtraSession
+        Membership_Status = "Exceed Limit"
+
+    return Limit, Total_Session, Remaining_Sessions, Exceed, Costs, Membership_Status
+
+
+#Help Menu Section 
+def Show_HelpMenu():
+    print("\n--- HELP ---")
+    print("1. View Contact Information") #
+    print("2. Return to Main Menu") #It will directly go back to the Main Menu.
+
+    Choice = input("Select option (1-2): ").strip()
+
+    if Choice == "2":
+        return
+    
+#Contact information Section under Help Section  
+    print("\n=== CONTACT INFORMATION ===")
+    print("Phone: 080 0626 252")
+    print("Official Website: https://www.manukau.ac.nz")
+    print("Student Centre: MIT Manukau Campus | The Atrium")
+    print("Open Hours: 7:00am–8:00pm (Mon–Fri), 8:30am–4:30pm (Sat)")
+    print("----------------------------\n")
+
+
+#Receipt Section
+
+def Receipt(Member_Type, Limit, Attend, New_Sessions,
+                 Total_Session, Remaining_Sessions, Exceed, Costs, Membership_Status):
+
+    print("\n===============================")
+    print("MIT Session Tracker")
+    print("=================================")
+
+    print(f"Member Type:{Member_Type.capitalize()}")
+    print(f"Weekly Limit:{Limit}")
+    print(f"Sessions Attend:{Attend}")
+    print(f"New Sessions:{New_Sessions}")
+    print(f"Total_Session Sessions: {Total_Session}")
+    print(f"Membership_Status:{Membership_Status}")
+
+    if Membership_Status == "Within Limit":
+        print(f"Sessions Remaining_Sessions:{Remaining_Sessions}")
+        print("Extra Sessions: 0")
+        print("Costs per Session: $8")
+        print("Total_Session Extra Costs: $0")
+    else:
+        print("Sessions Remaining_Sessions: 0")
+        print(f"Extra Sessions: {Exceed}")
+        print("Costs per Session: $8")
+        print("-----------------------------------")
+        print(f"Total_Session Extra Costs: ${Costs}")
+
+    print("\n========================================")
+    print("Thank you for using the MIT Session Tracker")
+    print("Have a Good Day, Cheers!!!")
+    print("=========================================\n")
+
+
+#Start the program again 
+main()
